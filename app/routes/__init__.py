@@ -5,7 +5,7 @@ from app.routes.orders import orders_routes
 from app.routes.products import products_routes
 from app.routes.students import students_routes
 
-app_routes = Blueprint('app_routes', __name__)
+app_routes = Blueprint("app_routes", __name__)
 
 # Register individual table blueprints
 app_routes.register_blueprint(categories_routes)
