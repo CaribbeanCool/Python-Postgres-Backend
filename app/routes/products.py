@@ -1,10 +1,13 @@
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
 from app.dao.products_dao import ProductsDAO
 
-products_routes = Blueprint('products_routes', __name__)
+products_routes = Blueprint("products_routes", __name__)
 products_dao = ProductsDAO()
 
-@products_routes.route('/products', methods=['GET'])
+
+@products_routes.route("/products", methods=["GET"])
+@jwt_required()
 def GetProducts():
     """
     Endpoint to fetch all products.
@@ -19,7 +22,8 @@ def GetProducts():
         print(f"Error fetching products: {e}")
         return jsonify({"error": str(e)}), 500
 
-@products_routes.route('/products/<int:product_id>', methods=['GET'])
+
+@products_routes.route("/products/<int:product_id>", methods=["GET"])
 def GetProductById(product_id):
     """
     Endpoint to fetch a product by its ID.
@@ -34,7 +38,8 @@ def GetProductById(product_id):
         print(f"Error fetching product by ID: {e}")
         return jsonify({"error": str(e)}), 500
 
-@products_routes.route('/products', methods=['POST'])
+
+@products_routes.route("/products", methods=["POST"])
 def CreateProduct():
     """
     Endpoint to create a new product.
@@ -57,7 +62,8 @@ def CreateProduct():
         print(f"Error creating product: {e}")
         return jsonify({"error": str(e)}), 500
 
-@products_routes.route('/products/<int:product_id>', methods=['PUT'])
+
+@products_routes.route("/products/<int:product_id>", methods=["PUT"])
 def UpdateProduct(product_id):
     try:
         data = request.get_json()
@@ -77,7 +83,8 @@ def UpdateProduct(product_id):
         print(f"Error updating product: {e}")
         return jsonify({"error": str(e)}), 500
 
-@products_routes.route('/products/<int:product_id>', methods=['DELETE'])
+
+@products_routes.route("/products/<int:product_id>", methods=["DELETE"])
 def DeleteProduct(product_id):
     try:
         product = products_dao.DeleteProduct(product_id)
