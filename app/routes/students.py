@@ -1,10 +1,11 @@
 from flask import Blueprint, jsonify, request
 from app.dao.students_dao import StudentDAO
 
-students_routes = Blueprint('students_routes', __name__)
+students_routes = Blueprint("students_routes", __name__)
 students_dao = StudentDAO()
 
-@students_routes.route('/students', methods=['GET'])
+
+@students_routes.route("/students", methods=["GET"])
 def GetStudents():
     """
     Endpoint to fetch all students.
@@ -14,12 +15,15 @@ def GetStudents():
         if students is not None:
             return jsonify(students), 200
         else:
-            return jsonify({"message": "Could not retrieve students or no students found"}), 404
+            return jsonify(
+                {"message": "Could not retrieve students or no students found"}
+            ), 404
     except Exception as e:
         print(f"Error fetching students: {e}")
         return jsonify({"error": str(e)}), 500
 
-@students_routes.route('/students/<int:student_id>', methods=['GET'])
+
+@students_routes.route("/students/<int:student_id>", methods=["GET"])
 def GetStudentById(student_id):
     """
     Endpoint to fetch a student by its ID.
@@ -34,7 +38,8 @@ def GetStudentById(student_id):
         print(f"Error fetching product by ID: {e}")
         return jsonify({"error": str(e)}), 500
 
-@students_routes.route('/students', methods=['POST'])
+
+@students_routes.route("/students", methods=["POST"])
 def CreateStudent():
     """
     Endpoint to create a new student.
@@ -47,9 +52,13 @@ def CreateStudent():
         date_of_birth = data.get("date_of_birth")
 
         if not first_name or not last_name or not email or not date_of_birth:
-            return jsonify({"error": "First Name, Last Name, Email and Date of Birth are required"}), 400
+            return jsonify(
+                {"error": "First Name, Last Name, Email and Date of Birth are required"}
+            ), 400
 
-        student_id = students_dao.CreateStudent(first_name, last_name, email, date_of_birth)
+        student_id = students_dao.CreateStudent(
+            first_name, last_name, email, date_of_birth
+        )
         if student_id:
             return jsonify({"student_id": student_id}), 201
         else:
@@ -57,6 +66,7 @@ def CreateStudent():
     except Exception as e:
         print(f"Error creating student: {e}")
         return jsonify({"error": str(e)}), 500
+
 
 # @students_routes.route('/products/<int:product_id>', methods=['PUT'])
 # def UpdateProduct(product_id):

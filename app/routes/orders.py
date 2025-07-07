@@ -1,10 +1,11 @@
 from flask import Blueprint, jsonify, request
 from app.dao.orders_dao import OrdersDAO
 
-orders_routes = Blueprint('orders_routes', __name__)
+orders_routes = Blueprint("orders_routes", __name__)
 orders_dao = OrdersDAO()
 
-@orders_routes.route('/orders', methods=['GET'])
+
+@orders_routes.route("/orders", methods=["GET"])
 def GetOrders():
     """
     Endpoint to fetch all orders.
@@ -19,7 +20,8 @@ def GetOrders():
         print(f"Error fetching orders: {e}")
         return jsonify({"error": str(e)}), 500
 
-@orders_routes.route('/orders/<int:order_id>', methods=['GET'])
+
+@orders_routes.route("/orders/<int:order_id>", methods=["GET"])
 def GetOrderById(order_id):
     """
     Endpoint to fetch an order by its ID.
@@ -34,15 +36,16 @@ def GetOrderById(order_id):
         print(f"Error fetching order by ID: {e}")
         return jsonify({"error": str(e)}), 500
 
-@orders_routes.route('/orders', methods=['POST'])
+
+@orders_routes.route("/orders", methods=["POST"])
 def CreateOrder():
     """
     Endpoint to create a new order.
     """
     try:
         data = request.get_json()
-        customer_id = data.get('customer_id')
-        order_date = data.get('order_date')
+        customer_id = data.get("customer_id")
+        order_date = data.get("order_date")
         order_id = orders_dao.CreateOrder(customer_id, order_date)
         return jsonify({"order_id": order_id}), 201
     except Exception as e:

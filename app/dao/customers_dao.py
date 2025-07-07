@@ -1,5 +1,6 @@
 from app.server import GetDBConnection
 
+
 class CustomersDAO:
     def __init__(self):
         """
@@ -35,7 +36,9 @@ class CustomersDAO:
             dict: A dictionary representing the customer record, or None if not found.
         """
         try:
-            self.cursor.execute("SELECT * FROM customers WHERE customer_id = %s", (customer_id,))
+            self.cursor.execute(
+                "SELECT * FROM customers WHERE customer_id = %s", (customer_id,)
+            )
             row = self.cursor.fetchone()
             columns = [desc[0] for desc in self.cursor.description]
             customer = dict(zip(columns, row)) if row else None
@@ -44,7 +47,7 @@ class CustomersDAO:
             print(f"Error fetching customer by ID: {e}")
             return None
 
-    def CreateCustomer(self, name:str, email:str):
+    def CreateCustomer(self, name: str, email: str):
         """
         Creates a new customer in the database.
         This method inserts a new customer into the customers table and returns the new customer's ID.
@@ -59,7 +62,7 @@ class CustomersDAO:
         try:
             self.cursor.execute(
                 "INSERT INTO customers (name, email) VALUES (%s, %s) RETURNING customer_id",
-                (name, email)
+                (name, email),
             )
             customer_id = self.cursor.fetchone()[0]
             self.connection.commit()

@@ -1,5 +1,6 @@
 from app.server import GetDBConnection
 
+
 class OrdersDAO:
     """
     Orders Data Access Object (DAO) class for interacting with the database.
@@ -38,7 +39,9 @@ class OrdersDAO:
         Returns a dictionary representing the order.
         """
         try:
-            self.cursor.execute("SELECT * FROM orders WHERE order_id = %s;", (order_id,))
+            self.cursor.execute(
+                "SELECT * FROM orders WHERE order_id = %s;", (order_id,)
+            )
             row = self.cursor.fetchone()
             columns = [desc[0] for desc in self.cursor.description]
             order = dict(zip(columns, row)) if row else None
@@ -53,7 +56,10 @@ class OrdersDAO:
         Returns the ID of the newly created order.
         """
         try:
-            self.cursor.execute("INSERT INTO orders (customer_id, order_date) VALUES (%s, %s) RETURNING id;", (customer_id, order_date))
+            self.cursor.execute(
+                "INSERT INTO orders (customer_id, order_date) VALUES (%s, %s) RETURNING id;",
+                (customer_id, order_date),
+            )
             order_id = self.cursor.fetchone()[0]
             self.connection.commit()
             return order_id

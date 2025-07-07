@@ -1,5 +1,6 @@
 from app.server import GetDBConnection
 
+
 class ProductsDAO:
     def __init__(self):
         self.connection = GetDBConnection()
@@ -38,26 +39,33 @@ class ProductsDAO:
             print(f"Error fetching product by ID: {e}")
             return None
 
-    def CreateProduct(self, product_name:str, unit:str, price) -> int | None:
+    def CreateProduct(self, product_name: str, unit: str, price) -> int | None:
         try:
             if not isinstance(product_name, str):
-                print(f"Error: product_name must be a string, but got {type(product_name)}")
+                print(
+                    f"Error: product_name must be a string, but got {type(product_name)}"
+                )
                 raise TypeError
                 return None
 
-            self.cursor.execute("SELECT product_id FROM products WHERE product_name = %s;", (product_name,))
+            self.cursor.execute(
+                "SELECT product_id FROM products WHERE product_name = %s;",
+                (product_name,),
+            )
             duplicate = self.cursor.fetchone()[0]
 
             if duplicate:
-                print(f"Error: Product with name '{product_name}' already exists with ID {duplicate}.")
+                print(
+                    f"Error: Product with name '{product_name}' already exists with ID {duplicate}."
+                )
                 return None
 
             self.cursor.execute(
                 "INSERT INTO products (product_name, unit, price) VALUES (%s, %s, %s) RETURNING product_id;",
-                (product_name, unit, price)
+                (product_name, unit, price),
             )
             product_id = self.cursor.fetchone()[0]
-            
+
             if product_id:
                 self.connection.commit()
                 return product_id
@@ -67,7 +75,9 @@ class ProductsDAO:
                 return None
         except TypeError as e:
             print(f"Error creating product (TypeError): {e}")
-            print(f"Debug Info: product_name type: {type(product_name)}, value: '{product_name}'")
+            print(
+                f"Debug Info: product_name type: {type(product_name)}, value: '{product_name}'"
+            )
             print(f"Debug Info: unit type: {type(unit)}, value: '{unit}'")
             print(f"Debug Info: price type: {type(price)}, value: '{price}'")
             self.connection.rollback()
@@ -77,20 +87,22 @@ class ProductsDAO:
             self.connection.rollback()
             return None
 
-    def UpdateProduct(self, product_id: int, category_id:int, unit:str, price:float) -> int | None:
+    def UpdateProduct(
+        self, product_id: int, category_id: int, unit: str, price: float
+    ) -> int | None:
         try:
             self.cursor.execute(
                 "UPDATE products SET category_id=%s, unit=%s, price=%s WHERE product_id=%s RETURNING product_id;",
-                (category_id, unit, price, product_id)
+                (category_id, unit, price, product_id),
             )
             prod_id = self.cursor.fetchone()[0]
             if prod_id:
                 self.connection.commit()
                 return prod_id
             else:
-                self.connection.rollback() 
+                self.connection.rollback()
                 print(f"Info: Product with ID {product_id} not found for update.")
-                return None 
+                return None
         except Exception as e:
             print(f"Error updating product: {e}")
             self.connection.rollback()
@@ -100,12 +112,12 @@ class ProductsDAO:
         try:
             self.cursor.execute(
                 "DELETE FROM products WHERE product_id=%s RETURNING product_id;",
-                (product_id,)
+                (product_id,),
             )
             # Based on the error "'int' object does not support indexing" on a line
             # like `var = fetchone()[0]`, we assume fetchone() might be returning
             # an integer directly when a row is found with RETURNING, or None otherwise.
-            
+
             deleted_id = self.cursor.fetchone()
             if deleted_id is not None:
                 self.connection.commit()

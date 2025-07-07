@@ -1,10 +1,11 @@
 from flask import Blueprint, jsonify, request
 from app.dao.customers_dao import CustomersDAO
 
-customers_routes = Blueprint('customers_routes', __name__)
+customers_routes = Blueprint("customers_routes", __name__)
 customers_dao = CustomersDAO()
 
-@customers_routes.route('/customers', methods=['GET'])
+
+@customers_routes.route("/customers", methods=["GET"])
 def GetCustomers():
     """
     Endpoint to fetch all customers.
@@ -19,7 +20,8 @@ def GetCustomers():
         print(f"Error fetching customers: {e}")
         return jsonify({"error": str(e)}), 500
 
-@customers_routes.route('/customers/<int:customer_id>', methods=['GET'])
+
+@customers_routes.route("/customers/<int:customer_id>", methods=["GET"])
 def GetCustomerById(customer_id):
     """
     Endpoint to fetch a customer by its ID.
@@ -33,6 +35,7 @@ def GetCustomerById(customer_id):
     except Exception as e:
         print(f"Error fetching customer by ID: {e}")
         return jsonify({"error": str(e)}), 500
+
 
 # @customers_routes.route('/customers', methods=['POST'])
 # def create_customer():

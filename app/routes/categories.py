@@ -1,10 +1,11 @@
 from flask import Blueprint, jsonify, request
 from app.dao.categories_dao import CategoriesDAO
 
-categories_routes = Blueprint('categories_routes', __name__)
+categories_routes = Blueprint("categories_routes", __name__)
 categories_dao = CategoriesDAO()
 
-@categories_routes.route('/categories', methods=['GET'])
+
+@categories_routes.route("/categories", methods=["GET"])
 def GetCategories():
     """
     Endpoint to fetch all categories.
@@ -19,7 +20,8 @@ def GetCategories():
         print(f"Error fetching categories: {e}")
         return jsonify({"error": str(e)}), 500
 
-@categories_routes.route('/categories/<int:category_id>', methods=['GET'])
+
+@categories_routes.route("/categories/<int:category_id>", methods=["GET"])
 def GetCategoryById(category_id):
     """
     Endpoint to fetch a category by its ID.
@@ -34,7 +36,8 @@ def GetCategoryById(category_id):
         print(f"Error fetching category: {e}")
         return jsonify({"error": str(e)}), 500
 
-@categories_routes.route('/categories', methods=['POST'])
+
+@categories_routes.route("/categories", methods=["POST"])
 def CreateCategory():
     """
     Endpoint to create a new category.
@@ -42,7 +45,7 @@ def CreateCategory():
     try:
         # Assuming the request body contains JSON data with category details
         data = request.get_json()
-        category_name = data.get('category_name')
+        category_name = data.get("category_name")
         if not category_name:
             return jsonify({"error": "Category name is required"}), 400
 
@@ -56,7 +59,8 @@ def CreateCategory():
         print(f"Error creating category: {e}")
         return jsonify({"error": str(e)}), 500
 
-@categories_routes.route('/categories/<int:category_id>', methods=['PUT'])
+
+@categories_routes.route("/categories/<int:category_id>", methods=["PUT"])
 def UpdateCategory(category_id):
     """
     Endpoint to update an existing category.
@@ -64,7 +68,7 @@ def UpdateCategory(category_id):
     try:
         # Assuming the request body contains JSON data with updated category details
         data = request.get_json()
-        description = data.get('description')
+        description = data.get("description")
         if not description:
             return jsonify({"error": "Description is required"}), 400
 

@@ -1,5 +1,6 @@
 from app.server import GetDBConnection
 
+
 class StudentDAO:
     def __init__(self):
         self.connection = GetDBConnection()
@@ -38,7 +39,9 @@ class StudentDAO:
             print(f"Error fetching product by ID: {e}")
             return None
 
-    def CreateStudent(self, first_name:str, last_name:str, email:str, date_of_birth) -> int | None: 
+    def CreateStudent(
+        self, first_name: str, last_name: str, email: str, date_of_birth
+    ) -> int | None:
         # date_of_birth can be a datetime.date object or 'YYYY-MM-DD' string
         try:
             # Optional: Add a check for duplicate students if necessary, e.g., by email
@@ -54,21 +57,23 @@ class StudentDAO:
                 VALUES (%s, %s, %s, %s) 
                 RETURNING student_id; 
                 """,
-                (first_name, last_name, email, date_of_birth)
+                (first_name, last_name, email, date_of_birth),
             )
             student_id = self.cursor.fetchone()[0]
-            
+
             if student_id:
                 self.connection.commit()
-                return student_id 
+                return student_id
             else:
                 self.connection.rollback()
                 print("Error: Failed to retrieve student_id after insert.")
                 return None
-        except TypeError as e: 
+        except TypeError as e:
             # Catch potential type errors, e.g. if date_of_birth is not in a compatible format
             print(f"Error creating student (TypeError): {e}")
-            print(f"Debug Info: first_name: {first_name}, last_name: {last_name}, email: {email}, date_of_birth: {date_of_birth} (type: {type(date_of_birth)})")
+            print(
+                f"Debug Info: first_name: {first_name}, last_name: {last_name}, email: {email}, date_of_birth: {date_of_birth} (type: {type(date_of_birth)})"
+            )
             self.connection.rollback()
             return None
         except Exception as e:
@@ -87,9 +92,9 @@ class StudentDAO:
     #             self.connection.commit()
     #             return prod_id
     #         else:
-    #             self.connection.rollback() 
+    #             self.connection.rollback()
     #             print(f"Info: Product with ID {product_id} not found for update.")
-    #             return None 
+    #             return None
     #     except Exception as e:
     #         print(f"Error updating product: {e}")
     #         self.connection.rollback()
@@ -104,7 +109,7 @@ class StudentDAO:
     #         # Based on the error "'int' object does not support indexing" on a line
     #         # like `var = fetchone()[0]`, we assume fetchone() might be returning
     #         # an integer directly when a row is found with RETURNING, or None otherwise.
-            
+
     #         deleted_id = self.cursor.fetchone()
     #         if deleted_id is not None:
     #             self.connection.commit()
