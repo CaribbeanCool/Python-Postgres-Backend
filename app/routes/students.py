@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from app.dao.students_dao import StudentDAO
+from app.dao import StudentDAO
 
 students_routes = Blueprint("students_routes", __name__)
 students_dao = StudentDAO()
