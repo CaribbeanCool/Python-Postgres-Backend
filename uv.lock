@@ -346,7 +346,7 @@ wheels = [
 [[package]]
 name = "python-postgres"
 version = "0.1.0"
-source = { editable = "." }
+source = { virtual = "." }
 dependencies = [
     { name = "flask" },
     { name = "flask-cors" },
