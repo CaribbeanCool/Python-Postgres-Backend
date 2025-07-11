@@ -1,4 +1,4 @@
-name: "Install uv"
+name: "install uv"
 description: "installs uv using the community action"
 runs:
   using: composite
