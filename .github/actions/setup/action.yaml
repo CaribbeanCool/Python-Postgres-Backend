@@ -1,9 +1,14 @@
 name: "install uv"
 description: "installs uv using the community action"
+inputs:
+  version:
+    description: "uv version to install"
+    required: false
+    default: "0.4.25"
 runs:
   using: composite
   steps:
     - name: install uv
       uses: astral-sh/setup-uv@v3
       with:
-        version: "0.4.25"
+        version: ${{ inputs.version }}
