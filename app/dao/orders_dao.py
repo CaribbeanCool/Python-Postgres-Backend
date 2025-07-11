@@ -1,4 +1,4 @@
-from app.server import GetDBConnection
+from server import GetDBConnection
 
 
 class OrdersDAO:

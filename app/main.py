@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
-from app.routes import app_routes
+from routes import app_routes
 from flask_jwt_extended import JWTManager
 from dotenv import load_dotenv
 import os

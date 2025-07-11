@@ -1,10 +1,10 @@
 from flask import Blueprint
-from app.routes.categories import categories_routes
-from app.routes.customers import customers_routes
-from app.routes.orders import orders_routes
-from app.routes.products import products_routes
-from app.routes.students import students_routes
-from app.routes.auth import auth_routes
+from routes.categories import categories_routes
+from routes.customers import customers_routes
+from routes.orders import orders_routes
+from routes.products import products_routes
+from routes.students import students_routes
+from routes.auth import auth_routes
 
 app_routes = Blueprint("app_routes", __name__)
 

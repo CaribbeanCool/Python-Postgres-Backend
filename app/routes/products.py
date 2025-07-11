@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required
-from app.dao import ProductsDAO
+from dao import ProductsDAO
 
 products_routes = Blueprint("products_routes", __name__)
 products_dao = ProductsDAO()

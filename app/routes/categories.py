@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from app.dao import CategoriesDAO
+from dao import CategoriesDAO
 
 categories_routes = Blueprint("categories_routes", __name__)
 categories_dao = CategoriesDAO()
