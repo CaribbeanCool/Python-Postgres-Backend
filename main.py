@@ -2,11 +2,15 @@ from flask import Flask
 from flask_cors import CORS
 from app.routes import app_routes
 from flask_jwt_extended import JWTManager
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 
 app = Flask(__name__)
+app.config["JWT_SECRET_KEY"] = os.getenv("ADMIN_USERNAME")
 jwt = JWTManager(app)
-
 
 CORS(app)
 

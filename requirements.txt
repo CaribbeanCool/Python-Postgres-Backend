@@ -1,5 +1,7 @@
 flask
-python-dotenv
-psycopg2
-requests
 flask-cors
+flask-jwt-extended
+flask-migrate
+psycopg2
+python-dotenv
+requests

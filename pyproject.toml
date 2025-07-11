@@ -3,6 +3,9 @@ name = "python-postgres"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
+authors = [
+    { name = "Alejandro Perez", email = "alejandro.perez21@upr.edu" }
+]
 requires-python = ">=3.13"
 dependencies = [
     "flask>=3.1.1",
@@ -12,4 +15,17 @@ dependencies = [
     "psycopg2>=2.9.10",
     "python-dotenv>=1.1.1",
     "requests>=2.32.4",
+]
+
+[project.scripts]
+python-postgres = "python_postgres:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pyright>=1.1.403",
+    "pytest>=8.4.1",
 ]
