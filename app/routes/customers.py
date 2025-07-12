@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify
 from dao import CustomersDAO
 
 customers_routes = Blueprint("customers_routes", __name__)
