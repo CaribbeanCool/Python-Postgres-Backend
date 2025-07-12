@@ -1,132 +1,164 @@
 from server import GetDBConnection
+from typing import List, Dict, Any, Optional
 
 
 class ProductsDAO:
-    def __init__(self):
-        self.connection = GetDBConnection()
-        self.cursor = self.connection.cursor()
-        print("> (Products) Connection to PostreSQL was successfull...")
-
-    def GetProducts(self):
+    @staticmethod
+    def GetProducts() -> List[Dict[str, Any]]:
         """
         Fetches all products from the database.
         Returns a list of dictionaries, each representing a product.
         """
+        conn = GetDBConnection()
+        if conn is None:
+            return []
+
         try:
-            self.cursor.execute("SELECT * FROM products;")
-            rows = self.cursor.fetchall()
-            # Get column names from the cursor description
-            columns = [desc[0] for desc in self.cursor.description]
-            # Convert rows to a list of dictionaries
-            products = [dict(zip(columns, row)) for row in rows]
-            return products
+            with conn.cursor() as cursor:
+                cursor.execute("SELECT * FROM products")
+                results = cursor.fetchall()
+                columns = [desc[0] for desc in cursor.description]
+
+                products = []
+                for result in results:
+                    products.append(dict(zip(columns, result)))
+                return products
         except Exception as e:
             print(f"Error fetching products: {e}")
-            return None
+            return []
+        finally:
+            conn.close()
 
-    def GetProductById(self, product_id):
+    @staticmethod
+    def GetProductById(product_id: int) -> Optional[Dict[str, Any]]:
         """
         Fetches a product by its ID from the database.
         Returns a dictionary representing the product.
         """
+        conn = GetDBConnection()
+        if conn is None:
+            return None
+
         try:
-            self.cursor.execute("SELECT * FROM products WHERE id = %s;", (product_id))
-            row = self.cursor.fetchone()[0]
-            columns = [desc[0] for desc in self.cursor.description]
-            product = dict(zip(columns, row)) if row else None
-            return product
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    "SELECT * FROM products WHERE product_id = %s", (product_id,)
+                )
+                result = cursor.fetchone()
+
+                if result:
+                    columns = [desc[0] for desc in cursor.description]
+                    return dict(zip(columns, result))
+                return None
         except Exception as e:
             print(f"Error fetching product by ID: {e}")
             return None
+        finally:
+            conn.close()
 
-    def CreateProduct(self, product_name: str, unit: str, price) -> int | None:
+    @staticmethod
+    def CreateProduct(product_name: str, unit: str, price: float) -> Optional[int]:
+        """
+        Creates a new product in the database.
+        Returns the ID of the newly created product.
+        """
+        conn = GetDBConnection()
+        if conn is None:
+            return None
+
         try:
-            if not isinstance(product_name, str):
-                print(
-                    f"Error: product_name must be a string, but got {type(product_name)}"
+            with conn.cursor() as cursor:
+                # Check for duplicate product name
+                cursor.execute(
+                    "SELECT product_id FROM products WHERE product_name = %s",
+                    (product_name,),
                 )
-                raise TypeError
-                return None
+                duplicate = cursor.fetchone()
 
-            self.cursor.execute(
-                "SELECT product_id FROM products WHERE product_name = %s;",
-                (product_name,),
-            )
-            duplicate = self.cursor.fetchone()[0]
+                if duplicate:
+                    print(
+                        f"Error: Product with name '{product_name}' already exists with ID {duplicate[0]}."
+                    )
+                    return None
 
-            if duplicate:
-                print(
-                    f"Error: Product with name '{product_name}' already exists with ID {duplicate}."
+                # Insert new product
+                cursor.execute(
+                    "INSERT INTO products (product_name, unit, price) VALUES (%s, %s, %s) RETURNING product_id",
+                    (product_name, unit, price),
                 )
-                return None
-
-            self.cursor.execute(
-                "INSERT INTO products (product_name, unit, price) VALUES (%s, %s, %s) RETURNING product_id;",
-                (product_name, unit, price),
-            )
-            product_id = self.cursor.fetchone()[0]
-
-            if product_id:
-                self.connection.commit()
+                product_id = cursor.fetchone()[0]
+                conn.commit()
                 return product_id
-            else:
-                self.connection.rollback()
-                print("Error: Failed to retrieve product_id after insert.")
-                return None
-        except TypeError as e:
-            print(f"Error creating product (TypeError): {e}")
-            print(
-                f"Debug Info: product_name type: {type(product_name)}, value: '{product_name}'"
-            )
-            print(f"Debug Info: unit type: {type(unit)}, value: '{unit}'")
-            print(f"Debug Info: price type: {type(price)}, value: '{price}'")
-            self.connection.rollback()
-            return None
         except Exception as e:
-            print(f"Error creating product (General Exception): {e}")
-            self.connection.rollback()
+            print(f"Error creating product: {e}")
+            if conn:
+                conn.rollback()
+            return None
+        finally:
+            conn.close()
+
+    @staticmethod
+    def UpdateProduct(
+        product_id: int, category_id: int, unit: str, price: float
+    ) -> Optional[int]:
+        """
+        Updates an existing product in the database.
+        Returns the ID of the updated product.
+        """
+        conn = GetDBConnection()
+        if conn is None:
             return None
 
-    def UpdateProduct(
-        self, product_id: int, category_id: int, unit: str, price: float
-    ) -> int | None:
         try:
-            self.cursor.execute(
-                "UPDATE products SET category_id=%s, unit=%s, price=%s WHERE product_id=%s RETURNING product_id;",
-                (category_id, unit, price, product_id),
-            )
-            prod_id = self.cursor.fetchone()[0]
-            if prod_id:
-                self.connection.commit()
-                return prod_id
-            else:
-                self.connection.rollback()
-                print(f"Info: Product with ID {product_id} not found for update.")
-                return None
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    "UPDATE products SET category_id=%s, unit=%s, price=%s WHERE product_id=%s RETURNING product_id",
+                    (category_id, unit, price, product_id),
+                )
+                result = cursor.fetchone()
+
+                if result:
+                    conn.commit()
+                    return result[0]
+                else:
+                    print(f"Info: Product with ID {product_id} not found for update.")
+                    return None
         except Exception as e:
             print(f"Error updating product: {e}")
-            self.connection.rollback()
+            if conn:
+                conn.rollback()
+            return None
+        finally:
+            conn.close()
+
+    @staticmethod
+    def DeleteProduct(product_id: int) -> Optional[int]:
+        """
+        Deletes a product from the database.
+        Returns the ID of the deleted product.
+        """
+        conn = GetDBConnection()
+        if conn is None:
             return None
 
-    def DeleteProduct(self, product_id: int) -> int | None:
         try:
-            self.cursor.execute(
-                "DELETE FROM products WHERE product_id=%s RETURNING product_id;",
-                (product_id,),
-            )
-            # Based on the error "'int' object does not support indexing" on a line
-            # like `var = fetchone()[0]`, we assume fetchone() might be returning
-            # an integer directly when a row is found with RETURNING, or None otherwise.
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    "DELETE FROM products WHERE product_id=%s RETURNING product_id",
+                    (product_id,),
+                )
+                result = cursor.fetchone()
 
-            deleted_id = self.cursor.fetchone()
-            if deleted_id is not None:
-                self.connection.commit()
-                return deleted_id
-            else:
-                self.connection.rollback()
-                print(f"Info: Product with ID {product_id} not found for deletion.")
-                return None
+                if result:
+                    conn.commit()
+                    return result[0]
+                else:
+                    print(f"Info: Product with ID {product_id} not found for deletion.")
+                    return None
         except Exception as e:
             print(f"Error deleting product with ID {product_id}: {e}")
-            self.connection.rollback()
+            if conn:
+                conn.rollback()
             return None
+        finally:
+            conn.close()

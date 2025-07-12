@@ -3,7 +3,6 @@ from flask_jwt_extended import jwt_required
 from dao import ProductsDAO
 
 products_routes = Blueprint("products_routes", __name__)
-products_dao = ProductsDAO()
 
 
 @products_routes.route("/products", methods=["GET"])
@@ -13,11 +12,11 @@ def GetProducts():
     Endpoint to fetch all products.
     """
     try:
-        products = products_dao.GetProducts()
+        products = ProductsDAO.GetProducts()  # Call static method directly
         if products is not None:
             return jsonify(products), 200
         else:
-            return jsonify({"error": "No products found"}), 404
+            return jsonify({"error": "Failed to fetch products"}), 500
     except Exception as e:
         print(f"Error fetching products: {e}")
         return jsonify({"error": str(e)}), 500
@@ -29,7 +28,7 @@ def GetProductById(product_id):
     Endpoint to fetch a product by its ID.
     """
     try:
-        product = products_dao.GetProductById(product_id)
+        product = ProductsDAO.GetProductById(product_id)
         if product:
             return jsonify(product), 200
         else:
@@ -46,6 +45,10 @@ def CreateProduct():
     """
     try:
         data = request.get_json()
+
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+
         product_name = data.get("product_name")
         unit = data.get("unit")
         price = data.get("price")
@@ -53,9 +56,11 @@ def CreateProduct():
         if not product_name or not unit or not price:
             return jsonify({"error": "Product Name, Unit and Price are required"}), 400
 
-        product_id = products_dao.CreateProduct(product_name, unit, price)
+        product_id = ProductsDAO.CreateProduct(product_name, unit, price)
         if product_id:
-            return jsonify({"product_id": product_id}), 201
+            return jsonify(
+                {"product_id": product_id, "message": "Product created successfully"}
+            ), 201
         else:
             return jsonify({"error": "Failed to create product"}), 500
     except Exception as e:
@@ -65,8 +70,15 @@ def CreateProduct():
 
 @products_routes.route("/products/<int:product_id>", methods=["PUT"])
 def UpdateProduct(product_id):
+    """
+    Endpoint to update an existing product.
+    """
     try:
         data = request.get_json()
+
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+
         cat_id = data.get("category_id")
         unit = data.get("unit")
         price = data.get("price")
@@ -74,11 +86,16 @@ def UpdateProduct(product_id):
         if not cat_id or not unit or not price:
             return jsonify({"error": "Category Id, Unit and Price are required"}), 400
 
-        product = products_dao.UpdateProduct(product_id, cat_id, unit, price)
-        if product:
-            return jsonify(product), 200
+        updated_product_id = ProductsDAO.UpdateProduct(product_id, cat_id, unit, price)
+        if updated_product_id:
+            return jsonify(
+                {
+                    "product_id": updated_product_id,
+                    "message": "Product updated successfully",
+                }
+            ), 200
         else:
-            return jsonify({"error": "Product not found"}), 404
+            return jsonify({"error": "Product not found or failed to update"}), 404
     except Exception as e:
         print(f"Error updating product: {e}")
         return jsonify({"error": str(e)}), 500
@@ -86,10 +103,18 @@ def UpdateProduct(product_id):
 
 @products_routes.route("/products/<int:product_id>", methods=["DELETE"])
 def DeleteProduct(product_id):
+    """
+    Endpoint to delete a product.
+    """
     try:
-        product = products_dao.DeleteProduct(product_id)
-        if product:
-            return jsonify(product), 200
+        deleted_product_id = ProductsDAO.DeleteProduct(product_id)
+        if deleted_product_id:
+            return jsonify(
+                {
+                    "product_id": deleted_product_id,
+                    "message": "Product deleted successfully",
+                }
+            ), 200
         else:
             return jsonify({"error": "Product not found"}), 404
     except Exception as e:

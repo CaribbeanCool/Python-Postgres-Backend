@@ -2,7 +2,6 @@ from flask import Blueprint, jsonify, request
 from dao import OrdersDAO
 
 orders_routes = Blueprint("orders_routes", __name__)
-orders_dao = OrdersDAO()
 
 
 @orders_routes.route("/orders", methods=["GET"])
@@ -11,11 +10,11 @@ def GetOrders():
     Endpoint to fetch all orders.
     """
     try:
-        orders = orders_dao.GetOrders()
+        orders = OrdersDAO.GetOrders()
         if orders is not None:
             return jsonify(orders), 200
         else:
-            return jsonify({"error": "No orders found"}), 404
+            return jsonify({"error": "Failed to fetch orders"}), 500
     except Exception as e:
         print(f"Error fetching orders: {e}")
         return jsonify({"error": str(e)}), 500
@@ -27,7 +26,7 @@ def GetOrderById(order_id):
     Endpoint to fetch an order by its ID.
     """
     try:
-        order = orders_dao.GetOrderById(order_id)
+        order = OrdersDAO.GetOrderById(order_id)
         if order:
             return jsonify(order), 200
         else:
@@ -44,10 +43,25 @@ def CreateOrder():
     """
     try:
         data = request.get_json()
+
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+
         customer_id = data.get("customer_id")
         order_date = data.get("order_date")
-        order_id = orders_dao.CreateOrder(customer_id, order_date)
-        return jsonify({"order_id": order_id}), 201
+
+        if not customer_id or not order_date:
+            return jsonify({"error": "Customer ID and order date are required"}), 400
+
+        order_id = OrdersDAO.CreateOrder(customer_id, order_date)
+
+        if order_id:
+            return jsonify(
+                {"order_id": order_id, "message": "Order created successfully"}
+            ), 201
+        else:
+            return jsonify({"error": "Failed to create order"}), 500
+
     except Exception as e:
         print(f"Error creating order: {e}")
         return jsonify({"error": str(e)}), 500
