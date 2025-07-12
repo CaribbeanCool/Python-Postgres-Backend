@@ -17,9 +17,6 @@ dependencies = [
     "requests>=2.32.4",
 ]
 
-[project.scripts]
-python_postgres = "app.main:main"
-
 [tool.hatch.build.targets.wheel]
 packages = ["app"]
 
