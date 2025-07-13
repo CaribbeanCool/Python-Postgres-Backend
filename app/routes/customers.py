@@ -1,10 +1,12 @@
 from flask import Blueprint, jsonify
+from flask_jwt_extended import jwt_required
 from dao import CustomersDAO
 
 customers_routes = Blueprint("customers_routes", __name__)
 
 
 @customers_routes.route("/customers", methods=["GET"])
+@jwt_required()
 def GetCustomers():
     """
     Endpoint to fetch all customers.
@@ -37,6 +39,7 @@ def GetCustomerById(customer_id):
 
 
 # @customers_routes.route('/customers', methods=['POST'])
+# @jwt_required()
 # def create_customer():
 #     """
 #     Endpoint to create a new customer.

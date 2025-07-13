@@ -6,13 +6,12 @@ products_routes = Blueprint("products_routes", __name__)
 
 
 @products_routes.route("/products", methods=["GET"])
-@jwt_required()
 def GetProducts():
     """
     Endpoint to fetch all products.
     """
     try:
-        products = ProductsDAO.GetProducts()  # Call static method directly
+        products = ProductsDAO.GetProducts()
         if products is not None:
             return jsonify(products), 200
         else:
@@ -39,6 +38,7 @@ def GetProductById(product_id):
 
 
 @products_routes.route("/products", methods=["POST"])
+@jwt_required()
 def CreateProduct():
     """
     Endpoint to create a new product.
@@ -69,6 +69,7 @@ def CreateProduct():
 
 
 @products_routes.route("/products/<int:product_id>", methods=["PUT"])
+@jwt_required()
 def UpdateProduct(product_id):
     """
     Endpoint to update an existing product.
@@ -102,6 +103,7 @@ def UpdateProduct(product_id):
 
 
 @products_routes.route("/products/<int:product_id>", methods=["DELETE"])
+@jwt_required()
 def DeleteProduct(product_id):
     """
     Endpoint to delete a product.

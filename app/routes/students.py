@@ -1,10 +1,12 @@
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
 from dao import StudentDAO
 
 students_routes = Blueprint("students_routes", __name__)
 
 
 @students_routes.route("/students", methods=["GET"])
+@jwt_required()
 def GetStudents():
     """
     Endpoint to fetch all students.
@@ -37,6 +39,7 @@ def GetStudentById(student_id):
 
 
 @students_routes.route("/students", methods=["POST"])
+@jwt_required()
 def CreateStudent():
     """
     Endpoint to create a new student.

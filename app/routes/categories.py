@@ -1,9 +1,8 @@
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
 from dao import CategoriesDAO
 
 categories_routes = Blueprint("categories_routes", __name__)
-# Remove this line - no need to instantiate with static methods
-# categories_dao = CategoriesDAO()
 
 
 @categories_routes.route("/categories", methods=["GET"])
@@ -28,9 +27,7 @@ def GetCategoryById(category_id):
     Endpoint to fetch a category by its ID.
     """
     try:
-        category = CategoriesDAO.GetCategoryByID(
-            category_id
-        )  # Call static method directly
+        category = CategoriesDAO.GetCategoryByID(category_id)
         if category:
             return jsonify(category), 200
         else:
@@ -41,6 +38,7 @@ def GetCategoryById(category_id):
 
 
 @categories_routes.route("/categories", methods=["POST"])
+@jwt_required()
 def CreateCategory():
     """
     Endpoint to create a new category.
@@ -64,6 +62,7 @@ def CreateCategory():
 
 
 @categories_routes.route("/categories/<int:category_id>", methods=["PUT"])
+@jwt_required()
 def UpdateCategory(category_id):
     """
     Endpoint to update an existing category.

@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
 from dao import OrdersDAO
 
 orders_routes = Blueprint("orders_routes", __name__)
@@ -37,6 +38,7 @@ def GetOrderById(order_id):
 
 
 @orders_routes.route("/orders", methods=["POST"])
+@jwt_required()
 def CreateOrder():
     """
     Endpoint to create a new order.
