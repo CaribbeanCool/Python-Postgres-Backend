@@ -2,6 +2,12 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "Start Docker Container",
+            "type": "shell",
+            "command": "docker start my-postgres",
+            "problemMatcher": []
+        },
+        {
             "label": "Run Flask App",
             "type": "shell",
             "command": "uv",
@@ -10,6 +16,7 @@
                 "python",
                 "app/main.py"
             ],
+            "dependsOn": "Start Docker Container",
             "group": {
                 "kind": "build",
                 "isDefault": true
