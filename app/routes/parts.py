@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
 from dao.parts_dao import PartsDAO
 
-parts_routes = Blueprint("parts", __name__)
+parts_routes = Blueprint("parts_routes", __name__)
 
 
 # PREFIX IS "/parts"
@@ -24,15 +24,20 @@ def get_part_by_id(part_id):
 @jwt_required()
 def create_part():
     data = request.get_json()
-    if not data or "part_name" not in data:
-        return jsonify({"error": "Missing part_name"}), 400
+    part_name = data.get("pname")
+    part_color = data.get("pcolor")
+    part_material = data.get("pmaterial")
+    part_price = data.get("pprice")
+    part_weight = data.get("pweight")
 
-    part_id = PartsDAO.CreatePart(data["part_name"])
+    part_id = PartsDAO.CreatePart(
+        part_name, part_color, part_material, part_price, part_weight
+    )
 
     if part_id is None:
-        return jsonify({"error": "Failed to create part"}), 500
+        return jsonify({"error": "Failed to create part or duplicate values"}), 500
 
-    return jsonify({"message": "Part created successfully", "part_id": part_id}), 201
+    return jsonify({"message": "Part created successfully", "pid": part_id}), 201
 
 
 @parts_routes.route("/<int:part_id>", methods=["PUT"])

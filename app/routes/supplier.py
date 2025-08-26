@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
 from dao.supplier_dao import SupplierDAO
 
-supplier_routes = Blueprint("supplier", __name__)
+supplier_routes = Blueprint("supplier_routes", __name__)
 
 
 # PREFIX IS "/suppliers"
@@ -25,12 +25,16 @@ def get_supplier_by_id(supplier_id):
 @jwt_required()
 def create_supplier():
     data = request.get_json()
+    supplier_name = data.get("sname")
+    supplier_city = data.get("scity")
+    supplier_phone = data.get("sphone")
 
-    if not data or "supplier_name" not in data:
+    if not data:
         return jsonify({"error": "Missing supplier_name parameter"}), 400
 
-    supplier_name = data["supplier_name"]
-    supplier_id = SupplierDAO.CreateSupplier(supplier_name)
+    supplier_id = SupplierDAO.CreateSupplier(
+        supplier_name, supplier_city, supplier_phone
+    )
 
     if supplier_id is None:
         return jsonify({"error": "Failed to create supplier"}), 500
@@ -45,7 +49,7 @@ def create_supplier():
 def update_supplier(supplier_id):
     data = request.get_json()
 
-    if not data or "supplier_name" not in data:
+    if not data:
         return jsonify({"error": "Missing supplier_name parameter"}), 400
 
     supplier_name = data["supplier_name"]
@@ -70,9 +74,9 @@ def delete_supplier(supplier_id):
     if not supplier:
         return jsonify({"error": "Supplier not found"}), 404
 
-    success = SupplierDAO.DeleteSupplier(supplier_id)
+    is_successfull = SupplierDAO.DeleteSupplier(supplier_id)
 
-    if not success:
+    if not is_successfull:
         return jsonify({"error": "Failed to delete supplier"}), 500
 
     return jsonify({"message": "Supplier deleted successfully"})

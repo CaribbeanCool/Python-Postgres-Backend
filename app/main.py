@@ -4,6 +4,7 @@ from routes import app_routes
 from flask_jwt_extended import JWTManager
 from dotenv import load_dotenv
 from server import GetDBConnection
+from datetime import timedelta
 import os
 
 load_dotenv()
@@ -39,6 +40,8 @@ def CheckDatabaseConnection():
 
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = os.getenv("ADMIN_USERNAME")
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=60)  # Example: 30 minutes
+app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=7)  # Example: 7 days
 jwt = JWTManager(app)
 
 CORS(app)

@@ -11,17 +11,13 @@ class PartsDAO:
 
         try:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT * FROM supply_chain.parts")
+                cursor.execute("SELECT * FROM supply_chain.part")
                 results = cursor.fetchall()
+                columns = [desc[0] for desc in cursor.description]
 
                 parts = []
                 for result in results:
-                    parts.append(
-                        {
-                            "part_id": result[0],
-                            "part_name": result[1],
-                        }
-                    )
+                    parts.append(dict(zip(columns, result)))
                 return parts
         except Exception as e:
             print(f"Error fetching parts: {e}")
@@ -30,23 +26,19 @@ class PartsDAO:
             conn.close()
 
     @staticmethod
-    def GetPartById(part_id: int) -> Optional[Dict[str, Any]]:
+    def GetPartById(pid: int) -> Optional[Dict[str, Any]]:
         conn = GetDBConnection()
         if conn is None:
             return None
 
         try:
             with conn.cursor() as cursor:
-                cursor.execute(
-                    "SELECT * FROM supply_chain.parts WHERE part_id = %s", (part_id,)
-                )
+                cursor.execute("SELECT * FROM supply_chain.part WHERE pid = %s", (pid,))
                 result = cursor.fetchone()
 
                 if result:
-                    return {
-                        "part_id": result[0],
-                        "part_name": result[1],
-                    }
+                    columns = [desc[0] for desc in cursor.description]
+                    return dict(zip(columns, result))
                 return None
         except Exception as e:
             print(f"Error fetching part: {e}")
@@ -55,16 +47,25 @@ class PartsDAO:
             conn.close()
 
     @staticmethod
-    def CreatePart(part_name: str) -> Optional[int]:
+    def CreatePart(
+        pname: str, pcolor: str, pmaterial: str, pprice: float, pweight: float
+    ) -> Optional[int]:
         conn = GetDBConnection()
         if conn is None:
             return None
 
         try:
             with conn.cursor() as cursor:
+                # find duplicate part names
                 cursor.execute(
-                    "INSERT INTO supply_chain.parts (part_name) VALUES (%s) RETURNING part_id",
-                    (part_name,),
+                    "SELECT * FROM supply_chain.part WHERE pname = %s", (pname,)
+                )
+                if cursor.fetchone():
+                    print("Part with this name already exists.")
+                    return None
+                cursor.execute(
+                    "INSERT INTO supply_chain.part (pname, pcolor, pmaterial, pprice, pweight) VALUES (%s, %s, %s, %s, %s) RETURNING pid",
+                    (pname, pcolor, pmaterial, pprice, pweight),
                 )
                 result = cursor.fetchone()
                 conn.commit()
@@ -78,7 +79,7 @@ class PartsDAO:
             conn.close()
 
     @staticmethod
-    def UpdatePart(part_id: int, part_name: str) -> bool:
+    def UpdatePart(pid: int, pname: str) -> bool:
         conn = GetDBConnection()
         if conn is None:
             return False
@@ -86,8 +87,8 @@ class PartsDAO:
         try:
             with conn.cursor() as cursor:
                 cursor.execute(
-                    "UPDATE supply_chain.parts SET part_name = %s WHERE part_id = %s",
-                    (part_name, part_id),
+                    "UPDATE supply_chain.part SET pname = %s WHERE pid = %s",
+                    (pname, pid),
                 )
                 conn.commit()
                 return True
@@ -100,16 +101,14 @@ class PartsDAO:
             conn.close()
 
     @staticmethod
-    def DeletePart(part_id: int) -> bool:
+    def DeletePart(pid: int) -> bool:
         conn = GetDBConnection()
         if conn is None:
             return False
 
         try:
             with conn.cursor() as cursor:
-                cursor.execute(
-                    "DELETE FROM supply_chain.parts WHERE part_id = %s", (part_id,)
-                )
+                cursor.execute("DELETE FROM supply_chain.part WHERE pid = %s", (pid,))
                 conn.commit()
                 return True
         except Exception as e:
