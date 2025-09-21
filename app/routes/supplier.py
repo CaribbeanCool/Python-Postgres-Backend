@@ -80,3 +80,22 @@ def delete_supplier(supplier_id):
         return jsonify({"error": "Failed to delete supplier"}), 500
 
     return jsonify({"message": "Supplier deleted successfully"})
+
+
+@supplier_routes.route("/min-price", methods=["GET"])
+def get_supplier_with_parts_above_price(price: float = 200.0):
+    price = request.args.get("price", default=200.0, type=float)
+    suppliers = SupplierDAO.GetSupplierWithPartsAbovePrice(price)
+    return jsonify(suppliers)
+
+
+@supplier_routes.route("/filter", methods=["GET"])
+def get_suppliers_by_city_and_material():
+    city = request.args.get("city")
+    material = request.args.get("material")
+    if not city or not material:
+        return jsonify({"error": "Missing 'city' or 'material' query parameter"}), 400
+
+    # Match the DAO method name you implemented (ensure consistent casing)
+    suppliers = SupplierDAO.GetSuppliersByCityandMaterial(city, material)
+    return jsonify(suppliers)

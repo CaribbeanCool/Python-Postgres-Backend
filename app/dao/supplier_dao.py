@@ -127,3 +127,61 @@ class SupplierDAO:
             return False
         finally:
             conn.close()
+
+    @staticmethod
+    def GetSupplierWithPartsAbovePrice(price: float) -> List[Dict[str, Any]]:
+        conn = GetDBConnection()
+        if conn is None:
+            return []
+
+        try:
+            with conn.cursor() as cursor:
+                query = """
+                select distinct sid, sname, pmaterial, pprice
+                from supplier s
+                natural inner join supplies su
+                natural inner join part p
+                where p.pprice > (%s);
+                """
+                cursor.execute(query, (price,))
+                results = cursor.fetchall()
+                columns = [desc[0] for desc in cursor.description]
+                suppliers = []
+                for result in results:
+                    suppliers.append(dict(zip(columns, result)))
+                return suppliers
+        except Exception as e:
+            print(f"Error fetching suppliers with parts above price: {e}")
+            return []
+        finally:
+            conn.close()
+
+    @staticmethod
+    def GetSuppliersByCityandMaterial(city: str, material: str) -> List[Dict[str, Any]]:
+        conn = GetDBConnection()
+        if conn is None:
+            return []
+
+        try:
+            with conn.cursor() as cursor:
+                query = """
+                select sid, sname, scity, pmaterial
+                from supplier s
+                natural inner join supplies su
+                natural inner join part p
+                where s.scity = %s
+                and p.pmaterial = %s
+                order by s.sid;
+                """
+                cursor.execute(query, (city, material))
+                results = cursor.fetchall()
+                columns = [desc[0] for desc in cursor.description]
+                suppliers = []
+                for result in results:
+                    suppliers.append(dict(zip(columns, result)))
+                return suppliers
+        except Exception as e:
+            print(f"Error fetching suppliers by city and material: {e}")
+            return []
+        finally:
+            conn.close()
