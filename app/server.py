@@ -6,9 +6,12 @@ import os
 
 load_dotenv()
 
-if os.getenv("APP_ENV") == "dev":
+if os.getenv("APP_ENV") == "dev" and os.getenv("DB") == "dev":
     DBNAME = os.getenv("DBNAME_TEST", "supply_chain")
     print("\n***\nUsing supply_chain database...\n***\n")
+elif os.getenv("APP_ENV") == "dev" and os.getenv("DB") == "dev2":
+    DBNAME = os.getenv("DBNAME_DEV2", "school")
+    print("\n***\nUsing school database...\n***\n")
 else:
     DBNAME = os.getenv("DBNAME")
     print("\n***\nUsing default database...\n***\n")
