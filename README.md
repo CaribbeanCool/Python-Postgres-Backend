@@ -1,10 +1,10 @@
-# Python PostgreSQL Integration
+# Python RESTful API Backend with Python, Flask, and PostgreSQL
 
 This repository contains code and examples for integrating Python applications with PostgreSQL databases.
 
 ## Overview
 
-This project demonstrates how to connect to, query, and manage PostgreSQL databases using Python. It includes examples of common database operations, best practices, and patterns for effective database integration.
+This personal project demonstrates how to create a RESTful API backend using Python, Flask, and PostgreSQL. It includes Data Access Objects (DAOs), routes, and authentication using JWT.
 
 ## Requirements
 
@@ -39,11 +39,14 @@ DB_PASSWORD=your_password
 
 ## Current DAOs
 
-- `OrderDAO`: Manages order-related database operations.
-- `CategoriesDAO`: Handles category-related database operations.
-- `CustomersDAO`: Manages customer-related database operations.
-- `ProductsDAO`: Handles product-related database operations
-- `StudentsDAO`: Manages student-related database operations.
+- CategoriesDAO
+- ProductsDAO
+- CustomersDAO
+- OrdersDAO
+- PartsDAO
+- SuppliersDAO
+- SuppliesDAO
+- StudentsDAO
 
 ## TODO
 
