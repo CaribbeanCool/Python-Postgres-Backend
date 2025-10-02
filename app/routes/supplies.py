@@ -1,5 +1,4 @@
-from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required
+from flask import Blueprint, jsonify
 from dao.supplies_dao import SuppliesDAO
 
 supplies_routes = Blueprint("supplies_routes", __name__)

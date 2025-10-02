@@ -1,5 +1,5 @@
 from server import GetDBConnection
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 
 
 class SuppliesDAO:
